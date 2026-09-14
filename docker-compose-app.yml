@@ -1,5 +1,11 @@
 name: workshop-v4
 
+# Application stack: the Go app and all infrastructure/observability services.
+# The incident agent runs separately (docker-compose-agent.yml) and joins the
+# workshop-net network defined here.
+#
+#   docker compose -f docker-compose-app.yml up --build -d --wait
+
 services:
   grafana:
     image: grafana/grafana:12.1.1
@@ -23,39 +29,6 @@ services:
       timeout: 3s
       retries: 30
       start_period: 30s
-
-  agent:
-    build: ./agent
-    restart: unless-stopped
-    init: true
-    env_file:
-      - path: ./agent/.env
-        required: false
-    environment:
-      APP_URL: http://app:8080
-      PROMETHEUS_URL: http://prometheus:9090
-      DATA_DIR: /data
-      OTEL_EXPORTER_OTLP_ENDPOINT: http://otel-collector:4318
-    volumes:
-      - agent-data:/data
-    ports:
-      - "127.0.0.1:${AGENT_PORT:-8090}:8090"
-    healthcheck:
-      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:8090/health',{signal:AbortSignal.timeout(3000)}).then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
-      interval: 15s
-      timeout: 5s
-      retries: 3
-      start_period: 15s
-    mem_limit: 512m
-    cpus: 0.5
-    security_opt:
-      - no-new-privileges:true
-    cap_drop: [ALL]
-    logging:
-      driver: json-file
-      options:
-        max-size: "5m"
-        max-file: "3"
 
   app:
     build: ./app
@@ -164,9 +137,14 @@ services:
       clickhouse:
         condition: service_healthy
 
+networks:
+  # Fixed name so the agent stack (docker-compose-agent.yml) can join it as an
+  # external network regardless of compose project names.
+  default:
+    name: workshop-net
+
 volumes:
   grafana-data:
-  agent-data:
   postgres-data:
   prometheus-data:
   clickhouse-data:
