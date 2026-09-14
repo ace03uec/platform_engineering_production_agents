@@ -1,8 +1,50 @@
 # Workshop starting point
 
-Baseline recorded on 14 September 2026. This document describes the current v4 implementation that we will begin with in the workshop. The next variation has not been designed or implemented yet.
+Baseline recorded on 14 September 2026. This document describes the current v4 implementation that we will begin with in the workshop. The first variation built on this repo, v0, is documented in the next section; the v4 baseline is kept below as historical reference.
 
-We start with a working create/read application, an observe-only Pi incident agent, and observability for both. Participants can inspect health, request metrics, traces, logs, and incident records. The agent currently receives only a small subset of that information.
+We start with a working create/read application, an observe-only Pi incident agent, and observability for both.
+
+## Repo layout since the split (v0 and beyond)
+
+Recorded 14 September 2026. The repository now runs as two independent Compose stacks, and the agent is developed as switchable versions under `agent/`.
+
+| Piece | Purpose |
+| --- | --- |
+| `docker-compose-app.yml` | The application stack: app, PostgreSQL, PgBouncer, Redis, Blackbox, Prometheus, ClickHouse, OTel Collector, Grafana. Project `workshop-v4`, network `workshop-net`. |
+| `docker-compose-agent.yml` | One agent version at a time. Builds `agent/${AGENT_VERSION}` (default `v0`) to image `workshop-agent:<version>` and joins `workshop-net` as an external network. Project `workshop-agent`. |
+| `agent/v0`, `agent/v1`, ... | Self-contained agent versions, each with its own Dockerfile. Model API keys for all versions go in a shared `agent/.env` (gitignored). |
+
+```sh
+docker compose -f docker-compose-app.yml up --build -d --wait
+AGENT_VERSION=v0 docker compose -f docker-compose-agent.yml up --build -d --wait
+```
+
+The app stack must be running first; bring the agent down before the app stack. Switching versions is re-running the second command with a different `AGENT_VERSION`; each version's image tag is kept for rollback. The v4 run commands in section 1 predate this split.
+
+### v0: liveness/readiness agent with basic Pi debugging
+
+v0 is the smallest useful Pi-based agent. It answers health checks, polls the app, and on a sustained outage asks a Pi model for one advisory diagnosis per incident. No tools, no state, no tracing. Each diagnosis is a throwaway in-memory Pi session with all tools disabled, a 90-second abort deadline, and `agent/v0/AGENTS.md` as the system prompt.
+
+| Endpoint | Behaviour |
+| --- | --- |
+| `GET /live` | 200 `{"status":"alive","version":"v0"}` whenever the HTTP server responds. |
+| `GET /ready`, `GET /health` | 200 while the monitor completed a poll within the last 45 seconds and the process is not stopping; 503 otherwise. Body includes `version`, `ready`, `lastPoll`, `incident`, and the latest app probe outcomes. |
+
+Every ten seconds v0 probes the app's `/health` and `/get` (five-second timeout each) and writes one structured log line per poll. Three consecutive failed polls open an incident; three consecutive successful polls resolve it. When an incident opens, one Pi diagnosis runs concurrently — monitoring does not wait for the model. The model receives only the bounded probe evidence (HTTP statuses or transport errors) and returns impact, evidence, likely cause/confidence, next diagnostic commands for the human, and a safe remedy:
+
+```sh
+docker logs workshop-agent --tail 5
+# {"event":"poll","healthy":false,"health":{"ok":false,"status":503},...}
+# {"event":"opened","incident":{"id":"...","openedAt":"..."}}
+# {"event":"diagnosis","incidentId":"...","report":"**Impact:** ..."}
+# {"event":"resolved","incident":{...}}
+```
+
+Readiness reflects the monitor loop, not the app and not model credentials: v0 stays ready while the app is down, and without a working model key the diagnosis logs `diagnosis_error` while monitoring continues. Diagnoses use the provider/model from `agent/.env` (`PI_PROVIDER`/`PI_MODEL`, defaults `anthropic`/`claude-sonnet-4-5`; see `agent/v0/.env.example`).
+
+### Seeing v0 in Grafana
+
+Prometheus already probes the agent's `/live` and `/ready` every five seconds through Blackbox Exporter, so the provisioned [Agent Health](http://localhost:3000/d/workshop-agent-health) dashboard shows v0 without changes: liveness UP, readiness UP, probe collection UP, plus the history and probe-duration panels. The dashboard is version-agnostic — it measures whatever agent listens on port 8090, so it will keep working for later versions. The readiness history panel also shows outage windows: while the app is down the agent itself stays ready, which is the distinction the panel is meant to teach. Participants can inspect health, request metrics, traces, logs, and incident records. The agent currently receives only a small subset of that information.
 
 ## 1. The running system
 
