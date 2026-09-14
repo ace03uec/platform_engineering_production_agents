@@ -1,0 +1,29 @@
+receivers:
+  otlp:
+    protocols:
+      http:
+        endpoint: 0.0.0.0:4318
+processors:
+  memory_limiter:
+    check_interval: 1s
+    limit_mib: 128
+    spike_limit_mib: 32
+  batch:
+    timeout: 1s
+exporters:
+  clickhouse:
+    endpoint: tcp://clickhouse:9000
+    database: otel
+    username: workshop
+    password: workshop
+    create_schema: true
+    ttl: 168h
+    retry_on_failure:
+      enabled: true
+      max_elapsed_time: 300s
+service:
+  pipelines:
+    traces:
+      receivers: [otlp]
+      processors: [memory_limiter, batch]
+      exporters: [clickhouse]

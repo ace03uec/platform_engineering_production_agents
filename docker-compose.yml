@@ -1,0 +1,172 @@
+name: workshop-v4
+
+services:
+  grafana:
+    image: grafana/grafana:12.1.1
+    ports:
+      - "127.0.0.1:${GRAFANA_PORT:-3000}:3000"
+    environment:
+      GF_SECURITY_ADMIN_USER: admin
+      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_ADMIN_PASSWORD:-workshop}
+      GF_USERS_ALLOW_SIGN_UP: "false"
+      GF_PLUGINS_PREINSTALL_SYNC: grafana-clickhouse-datasource@4.9.0
+    volumes:
+      - grafana-data:/var/lib/grafana
+      - ./observability/grafana/provisioning:/etc/grafana/provisioning:ro
+      - ./observability/grafana/dashboards:/var/lib/grafana/dashboards:ro
+    depends_on:
+      clickhouse:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O", "/dev/null", "http://127.0.0.1:3000/api/health"]
+      interval: 5s
+      timeout: 3s
+      retries: 30
+      start_period: 30s
+
+  agent:
+    build: ./agent
+    restart: unless-stopped
+    init: true
+    env_file:
+      - path: ./agent/.env
+        required: false
+    environment:
+      APP_URL: http://app:8080
+      PROMETHEUS_URL: http://prometheus:9090
+      DATA_DIR: /data
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://otel-collector:4318
+    volumes:
+      - agent-data:/data
+    ports:
+      - "127.0.0.1:${AGENT_PORT:-8090}:8090"
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:8090/health',{signal:AbortSignal.timeout(3000)}).then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+      start_period: 15s
+    mem_limit: 512m
+    cpus: 0.5
+    security_opt:
+      - no-new-privileges:true
+    cap_drop: [ALL]
+    logging:
+      driver: json-file
+      options:
+        max-size: "5m"
+        max-file: "3"
+
+  app:
+    build: ./app
+    ports:
+      - "127.0.0.1:${APP_PORT:-8080}:8080"
+    environment:
+      DATABASE_URL: postgres://workshop:workshop@pgbouncer:5432/workshop?sslmode=disable
+      REDIS_URL: redis://redis:6379/0
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://otel-collector:4318
+    depends_on:
+      pgbouncer:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O", "/dev/null", "http://127.0.0.1:8080/health"]
+      interval: 5s
+      timeout: 4s
+      retries: 10
+
+  postgres:
+    image: postgres:17-bookworm
+    environment:
+      POSTGRES_USER: workshop
+      POSTGRES_PASSWORD: workshop
+      POSTGRES_DB: workshop
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U workshop -d workshop"]
+      interval: 2s
+      timeout: 3s
+      retries: 20
+
+  pgbouncer:
+    image: edoburu/pgbouncer:v1.25.2-p0
+    environment:
+      DB_HOST: postgres
+      DB_PORT: "5432"
+      DB_USER: workshop
+      DB_PASSWORD: workshop
+      DB_NAME: workshop
+      AUTH_TYPE: scram-sha-256
+      POOL_MODE: transaction
+      DEFAULT_POOL_SIZE: "5"
+      MAX_CLIENT_CONN: "100"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "PGPASSWORD=workshop psql -h 127.0.0.1 -p 5432 -U workshop -d workshop -c 'SELECT 1' >/dev/null"]
+      interval: 2s
+      timeout: 3s
+      retries: 20
+
+  redis:
+    image: redis:7.4-alpine
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 2s
+      timeout: 3s
+      retries: 20
+
+  blackbox:
+    image: prom/blackbox-exporter:v0.27.0
+    command: ["--config.file=/etc/blackbox/config.yml"]
+    volumes:
+      - ./observability/blackbox.yml:/etc/blackbox/config.yml:ro
+    restart: unless-stopped
+
+  prometheus:
+    image: prom/prometheus:v3.5.0
+    ports:
+      - "127.0.0.1:${PROMETHEUS_PORT:-9090}:9090"
+    volumes:
+      - ./observability/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus-data:/prometheus
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O", "/dev/null", "http://127.0.0.1:9090/-/ready"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  clickhouse:
+    image: clickhouse/clickhouse-server:25.8
+    environment:
+      CLICKHOUSE_DB: otel
+      CLICKHOUSE_USER: workshop
+      CLICKHOUSE_PASSWORD: workshop
+      CLICKHOUSE_DEFAULT_ACCESS_MANAGEMENT: "1"
+    volumes:
+      - clickhouse-data:/var/lib/clickhouse
+      - ./observability/clickhouse/grafana-user.xml:/etc/clickhouse-server/users.d/grafana.xml:ro
+    healthcheck:
+      test: ["CMD", "clickhouse-client", "--user", "workshop", "--password", "workshop", "--query", "SELECT 1"]
+      interval: 5s
+      timeout: 3s
+      retries: 30
+
+  otel-collector:
+    image: otel/opentelemetry-collector-contrib:0.135.0
+    command: ["--config=/etc/otelcol/config.yml"]
+    volumes:
+      - ./observability/otel-collector.yml:/etc/otelcol/config.yml:ro
+    depends_on:
+      clickhouse:
+        condition: service_healthy
+
+volumes:
+  grafana-data:
+  agent-data:
+  postgres-data:
+  prometheus-data:
+  clickhouse-data:

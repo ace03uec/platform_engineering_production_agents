@@ -1,0 +1,308 @@
+{
+  "uid": "workshop-traces",
+  "title": "Workshop Traces",
+  "description": "OpenTelemetry spans from the existing ClickHouse otel.otel_traces table. Summary values use the selected time range; recent spans are limited to 500.",
+  "tags": [
+    "workshop",
+    "clickhouse",
+    "traces"
+  ],
+  "schemaVersion": 41,
+  "version": 1,
+  "editable": false,
+  "timezone": "browser",
+  "refresh": "10s",
+  "time": {
+    "from": "now-1h",
+    "to": "now"
+  },
+  "templating": {
+    "list": [
+      {
+        "name": "service",
+        "label": "Service",
+        "type": "custom",
+        "query": "all,workshop-app,workshop-agent",
+        "current": { "text": "all", "value": "all" },
+        "options": [
+          { "text": "all", "value": "all", "selected": true },
+          { "text": "workshop-app", "value": "workshop-app", "selected": false },
+          { "text": "workshop-agent", "value": "workshop-agent", "selected": false }
+        ]
+      },
+      {
+        "name": "trace_id",
+        "label": "Trace ID",
+        "type": "textbox",
+        "query": "",
+        "current": {
+          "text": "",
+          "value": ""
+        },
+        "options": [],
+        "hide": 0,
+        "skipUrlSync": false
+      }
+    ]
+  },
+  "panels": [
+    {
+      "id": 1,
+      "title": "Traces",
+      "type": "stat",
+      "datasource": {
+        "type": "grafana-clickhouse-datasource",
+        "uid": "clickhouse-traces"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 0,
+        "w": 8,
+        "h": 4
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "grafana-clickhouse-datasource",
+            "uid": "clickhouse-traces"
+          },
+          "editorType": "sql",
+          "pluginVersion": "4.9.0",
+          "format": 1,
+          "rawSql": "SELECT uniqExact(TraceId) AS traces FROM otel.otel_traces WHERE $__timeFilter(Timestamp) AND (${service:sqlstring} = 'all' OR ServiceName = ${service:sqlstring})"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "colorMode": "value",
+        "graphMode": "none"
+      }
+    },
+    {
+      "id": 2,
+      "title": "Error spans",
+      "type": "stat",
+      "datasource": {
+        "type": "grafana-clickhouse-datasource",
+        "uid": "clickhouse-traces"
+      },
+      "gridPos": {
+        "x": 8,
+        "y": 0,
+        "w": 8,
+        "h": 4
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "grafana-clickhouse-datasource",
+            "uid": "clickhouse-traces"
+          },
+          "editorType": "sql",
+          "pluginVersion": "4.9.0",
+          "format": 1,
+          "rawSql": "SELECT countIf(StatusCode = 'Error') AS errors FROM otel.otel_traces WHERE $__timeFilter(Timestamp) AND (${service:sqlstring} = 'all' OR ServiceName = ${service:sqlstring})"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "colorMode": "value",
+        "graphMode": "none"
+      }
+    },
+    {
+      "id": 3,
+      "title": "p95 span duration",
+      "type": "stat",
+      "datasource": {
+        "type": "grafana-clickhouse-datasource",
+        "uid": "clickhouse-traces"
+      },
+      "gridPos": {
+        "x": 16,
+        "y": 0,
+        "w": 8,
+        "h": 4
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "grafana-clickhouse-datasource",
+            "uid": "clickhouse-traces"
+          },
+          "editorType": "sql",
+          "pluginVersion": "4.9.0",
+          "format": 1,
+          "rawSql": "SELECT quantile(0.95)(Duration / 1000000) AS duration FROM otel.otel_traces WHERE $__timeFilter(Timestamp) AND (${service:sqlstring} = 'all' OR ServiceName = ${service:sqlstring})"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "ms"
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "colorMode": "value",
+        "graphMode": "none"
+      }
+    },
+    {
+      "id": 4,
+      "title": "Recent spans \u2014 click a trace ID for details",
+      "type": "table",
+      "datasource": {
+        "type": "grafana-clickhouse-datasource",
+        "uid": "clickhouse-traces"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 4,
+        "w": 24,
+        "h": 10
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "grafana-clickhouse-datasource",
+            "uid": "clickhouse-traces"
+          },
+          "editorType": "sql",
+          "pluginVersion": "4.9.0",
+          "format": 1,
+          "rawSql": "SELECT Timestamp, TraceId, ServiceName, SpanName, Duration / 1000000 AS DurationMs, StatusCode, StatusMessage FROM otel.otel_traces WHERE $__timeFilter(Timestamp) AND (${service:sqlstring} = 'all' OR ServiceName = ${service:sqlstring}) ORDER BY Timestamp DESC LIMIT 500"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "TraceId"
+            },
+            "properties": [
+              {
+                "id": "links",
+                "value": [
+                  {
+                    "title": "Show trace spans",
+                    "url": "/d/workshop-traces/workshop-traces?${__url_time_range}&var-service=${service:percentencode}&var-trace_id=${__value.raw}",
+                    "targetBlank": false
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "DurationMs"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "ms"
+              }
+            ]
+          }
+        ]
+      },
+      "options": {
+        "showHeader": true,
+        "cellHeight": "sm",
+        "footer": {
+          "show": false
+        }
+      }
+    },
+    {
+      "id": 5,
+      "title": "Selected trace \u2014 spans in start-time order",
+      "type": "table",
+      "datasource": {
+        "type": "grafana-clickhouse-datasource",
+        "uid": "clickhouse-traces"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 14,
+        "w": 24,
+        "h": 12
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "grafana-clickhouse-datasource",
+            "uid": "clickhouse-traces"
+          },
+          "editorType": "sql",
+          "pluginVersion": "4.9.0",
+          "format": 1,
+          "rawSql": "SELECT Timestamp, TraceId, SpanId, ParentSpanId, ServiceName, SpanName, Duration / 1000000 AS DurationMs, StatusCode, StatusMessage, SpanAttributes, ResourceAttributes FROM otel.otel_traces WHERE TraceId = ${trace_id:sqlstring} ORDER BY Timestamp ASC LIMIT 1000"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "DurationMs"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "ms"
+              }
+            ]
+          }
+        ]
+      },
+      "options": {
+        "showHeader": true,
+        "cellHeight": "sm",
+        "footer": {
+          "show": false
+        }
+      },
+      "description": "Paste the X-Trace-ID response header into the trace_id box, or click a recent trace ID. Trace details search all retained data, independently of the dashboard time range. Limited to 1,000 spans."
+    }
+  ]
+}

@@ -1,0 +1,36 @@
+global:
+  scrape_interval: 5s
+scrape_configs:
+  - job_name: workshop-app
+    static_configs:
+      - targets: [app:8080]
+  - job_name: health-probes
+    scrape_interval: 5s
+    scrape_timeout: 5s
+    metrics_path: /probe
+    params:
+      module: [http_health]
+    static_configs:
+      - targets: [http://app:8080/live]
+        labels:
+          service: workshop-app
+          check: liveness
+      - targets: [http://app:8080/ready]
+        labels:
+          service: workshop-app
+          check: readiness
+      - targets: [http://agent:8090/live]
+        labels:
+          service: workshop-agent
+          check: liveness
+      - targets: [http://agent:8090/ready]
+        labels:
+          service: workshop-agent
+          check: readiness
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: __param_target
+      - source_labels: [__param_target]
+        target_label: instance
+      - target_label: __address__
+        replacement: blackbox:9115

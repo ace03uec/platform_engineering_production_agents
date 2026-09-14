@@ -1,0 +1,19 @@
+<clickhouse>
+  <profiles>
+    <grafana_readonly>
+      <!-- Mode 2 allows the driver's per-query settings, but forbids writes. -->
+      <readonly>2</readonly>
+      <max_execution_time>10</max_execution_time>
+    </grafana_readonly>
+  </profiles>
+  <users>
+    <grafana>
+      <!-- Local workshop credentials; ClickHouse is not published to the host. -->
+      <password>workshop</password>
+      <networks><ip>::/0</ip></networks>
+      <profile>grafana_readonly</profile>
+      <quota>default</quota>
+      <allow_databases><database>otel</database></allow_databases>
+    </grafana>
+  </users>
+</clickhouse>

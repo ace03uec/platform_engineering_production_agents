@@ -1,0 +1,401 @@
+{
+  "uid": "workshop-agent-health",
+  "title": "Agent Health",
+  "description": "Liveness: HTTP server responds. Readiness: monitor completed a poll within 45 seconds and is not stopping. Does not require a healthy app or validate model credentials/provider availability. External HTTP probes every 5 seconds. Missing telemetry is UNKNOWN, not healthy.",
+  "schemaVersion": 41,
+  "version": 1,
+  "editable": false,
+  "tags": [
+    "workshop",
+    "health",
+    "agent"
+  ],
+  "timezone": "browser",
+  "refresh": "5s",
+  "time": {
+    "from": "now-1h",
+    "to": "now"
+  },
+  "panels": [
+    {
+      "id": 1,
+      "title": "Liveness",
+      "type": "stat",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "workshop-prometheus"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 0,
+        "w": 8,
+        "h": 5
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "probe_success{job=\"health-probes\",service=\"workshop-agent\",check=\"liveness\"} and on(job,instance) (up{job=\"health-probes\",service=\"workshop-agent\",check=\"liveness\"} == 1)",
+          "legendFormat": "{{check}}",
+          "instant": true,
+          "range": false,
+          "datasource": {
+            "type": "prometheus",
+            "uid": "workshop-prometheus"
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "noValue": "UNKNOWN",
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "red",
+                "value": null
+              },
+              {
+                "color": "green",
+                "value": 1
+              }
+            ]
+          },
+          "mappings": [
+            {
+              "type": "value",
+              "options": {
+                "0": {
+                  "text": "DOWN",
+                  "color": "red"
+                },
+                "1": {
+                  "text": "UP",
+                  "color": "green"
+                }
+              }
+            }
+          ]
+        },
+        "overrides": []
+      },
+      "options": {
+        "colorMode": "background",
+        "graphMode": "none",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        }
+      },
+      "description": "UNKNOWN means probe telemetry is missing; DOWN means the endpoint failed its HTTP 200 check."
+    },
+    {
+      "id": 2,
+      "title": "Readiness",
+      "type": "stat",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "workshop-prometheus"
+      },
+      "gridPos": {
+        "x": 8,
+        "y": 0,
+        "w": 8,
+        "h": 5
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "probe_success{job=\"health-probes\",service=\"workshop-agent\",check=\"readiness\"} and on(job,instance) (up{job=\"health-probes\",service=\"workshop-agent\",check=\"readiness\"} == 1)",
+          "legendFormat": "{{check}}",
+          "instant": true,
+          "range": false,
+          "datasource": {
+            "type": "prometheus",
+            "uid": "workshop-prometheus"
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "noValue": "UNKNOWN",
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "red",
+                "value": null
+              },
+              {
+                "color": "green",
+                "value": 1
+              }
+            ]
+          },
+          "mappings": [
+            {
+              "type": "value",
+              "options": {
+                "0": {
+                  "text": "DOWN",
+                  "color": "red"
+                },
+                "1": {
+                  "text": "UP",
+                  "color": "green"
+                }
+              }
+            }
+          ]
+        },
+        "overrides": []
+      },
+      "options": {
+        "colorMode": "background",
+        "graphMode": "none",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        }
+      },
+      "description": "UNKNOWN means probe telemetry is missing; DOWN means the endpoint failed its HTTP 200 check."
+    },
+    {
+      "id": 3,
+      "title": "Probe collection",
+      "type": "stat",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "workshop-prometheus"
+      },
+      "gridPos": {
+        "x": 16,
+        "y": 0,
+        "w": 8,
+        "h": 5
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "min(up{job=\"health-probes\",service=\"workshop-agent\"})",
+          "legendFormat": "{{check}}",
+          "instant": true,
+          "range": false,
+          "datasource": {
+            "type": "prometheus",
+            "uid": "workshop-prometheus"
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "noValue": "UNKNOWN",
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "red",
+                "value": null
+              },
+              {
+                "color": "green",
+                "value": 1
+              }
+            ]
+          },
+          "mappings": [
+            {
+              "type": "value",
+              "options": {
+                "0": {
+                  "text": "DOWN",
+                  "color": "red"
+                },
+                "1": {
+                  "text": "UP",
+                  "color": "green"
+                }
+              }
+            }
+          ]
+        },
+        "overrides": []
+      },
+      "options": {
+        "colorMode": "background",
+        "graphMode": "none",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        }
+      },
+      "description": "Whether Prometheus can scrape the probe exporter. This is not application health. If DOWN, liveness/readiness should be UNKNOWN."
+    },
+    {
+      "id": 4,
+      "title": "Liveness and readiness history",
+      "type": "timeseries",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "workshop-prometheus"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 5,
+        "w": 24,
+        "h": 8
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "probe_success{job=\"health-probes\",service=\"workshop-agent\"} and on(job,instance) (up{job=\"health-probes\",service=\"workshop-agent\"} == 1)",
+          "legendFormat": "{{check}}",
+          "instant": false,
+          "range": true,
+          "datasource": {
+            "type": "prometheus",
+            "uid": "workshop-prometheus"
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "noValue": "UNKNOWN",
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "red",
+                "value": null
+              },
+              {
+                "color": "green",
+                "value": 1
+              }
+            ]
+          },
+          "mappings": [
+            {
+              "type": "value",
+              "options": {
+                "0": {
+                  "text": "DOWN",
+                  "color": "red"
+                },
+                "1": {
+                  "text": "UP",
+                  "color": "green"
+                }
+              }
+            }
+          ],
+          "min": 0,
+          "max": 1,
+          "custom": {
+            "drawStyle": "line",
+            "lineInterpolation": "stepAfter",
+            "spanNulls": false,
+            "fillOpacity": 15
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "multi"
+        }
+      }
+    },
+    {
+      "id": 5,
+      "title": "HTTP probe duration",
+      "type": "timeseries",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "workshop-prometheus"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 13,
+        "w": 24,
+        "h": 8
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "probe_duration_seconds{job=\"health-probes\",service=\"workshop-agent\"} and on(job,instance) (up{job=\"health-probes\",service=\"workshop-agent\"} == 1)",
+          "legendFormat": "{{check}}",
+          "instant": false,
+          "range": true,
+          "datasource": {
+            "type": "prometheus",
+            "uid": "workshop-prometheus"
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "s",
+          "min": 0,
+          "custom": {
+            "spanNulls": false
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "multi"
+        }
+      }
+    }
+  ],
+  "links": [
+    {
+      "title": "App Health",
+      "type": "link",
+      "url": "/d/workshop-app-health",
+      "keepTime": true
+    },
+    {
+      "title": "Agent Health",
+      "type": "link",
+      "url": "/d/workshop-agent-health",
+      "keepTime": true
+    },
+    {
+      "title": "Traces",
+      "type": "link",
+      "url": "/d/workshop-traces",
+      "keepTime": true
+    }
+  ]
+}
