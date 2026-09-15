@@ -1,0 +1,15 @@
+{
+  "name": "workshop-agent-v1",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "node src/main.mjs"
+  },
+  "dependencies": {
+    "@earendil-works/pi-coding-agent": "0.85.1",
+    "@opentelemetry/api": "^1.9.1",
+    "@opentelemetry/exporter-trace-otlp-http": "^0.222.0",
+    "@opentelemetry/resources": "^2.11.0",
+    "@opentelemetry/sdk-node": "^0.222.0"
+  }
+}
