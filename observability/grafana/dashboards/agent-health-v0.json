@@ -408,6 +408,12 @@
       "type": "link",
       "url": "/d/workshop-agent-cost-v2",
       "keepTime": true
+    },
+    {
+      "title": "Agent Cost \u2014 v3",
+      "type": "link",
+      "url": "/d/workshop-agent-cost-v3",
+      "keepTime": true
     }
   ]
 }
