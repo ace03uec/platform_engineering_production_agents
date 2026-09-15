@@ -9,7 +9,7 @@ scrape_configs:
       - targets: [agent:8090]
         labels:
           service: workshop-agent
-          version: v5
+          version: v6
   - job_name: health-probes
     scrape_interval: 5s
     scrape_timeout: 5s

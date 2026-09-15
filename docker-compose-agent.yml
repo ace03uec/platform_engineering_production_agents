@@ -43,6 +43,7 @@ services:
     volumes:
       - agent-data:/data
       - workspace-data:/workspace
+      - eval-data:/evals
     ports:
       - "127.0.0.1:${AGENT_PORT:-8090}:8090"
     healthcheck:
@@ -76,3 +77,5 @@ volumes:
     name: workshop-agent-data
   workspace-data:
     name: workshop-workspace
+  eval-data:
+    name: workshop-agent-evals

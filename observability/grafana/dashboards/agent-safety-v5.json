@@ -344,6 +344,12 @@
       "type": "link",
       "url": "/d/workshop-agent-safety-v4",
       "keepTime": true
+    },
+    {
+      "title": "Evaluations \u2014 v6",
+      "type": "link",
+      "url": "/d/workshop-agent-evals-v6",
+      "keepTime": true
     }
   ]
 }

@@ -1,0 +1,447 @@
+{
+  "uid": "workshop-agent-evals-v6",
+  "title": "Agent Evaluations \u2014 v6",
+  "description": "Offline fixed-case evaluations. Live is real provider output; fixture is a scripted harness smoke test, NOT model performance. Latest complete paired run scores are held until the next run; inspect last-run timestamp and completion. Compare matching suite/prompt/grader/harness only.",
+  "schemaVersion": 41,
+  "version": 1,
+  "editable": false,
+  "tags": [
+    "workshop",
+    "cost",
+    "agent"
+  ],
+  "timezone": "browser",
+  "refresh": "5s",
+  "time": {
+    "from": "now-1h",
+    "to": "now"
+  },
+  "panels": [
+    {
+      "id": 1,
+      "title": "Pass rate by model",
+      "type": "timeseries",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "workshop-prometheus"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 0,
+        "w": 12,
+        "h": 8
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "agent_eval_pass_rate{mode=\"$mode\"}",
+          "legendFormat": "{{model}} / {{suite}} / {{prompt}}",
+          "instant": false,
+          "range": true,
+          "datasource": {
+            "type": "prometheus",
+            "uid": "workshop-prometheus"
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percentunit",
+          "min": 0,
+          "custom": {
+            "drawStyle": "line",
+            "fillOpacity": 15,
+            "spanNulls": false
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "multi"
+        }
+      },
+      "description": "Latest-run values held between evaluations. Missing data means UNKNOWN; fixture mode is not a model benchmark."
+    },
+    {
+      "id": 2,
+      "title": "Mean rubric score",
+      "type": "timeseries",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "workshop-prometheus"
+      },
+      "gridPos": {
+        "x": 12,
+        "y": 0,
+        "w": 12,
+        "h": 8
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "agent_eval_score{mode=\"$mode\"}",
+          "legendFormat": "{{model}} / {{suite}} / {{prompt}}",
+          "instant": false,
+          "range": true,
+          "datasource": {
+            "type": "prometheus",
+            "uid": "workshop-prometheus"
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percentunit",
+          "min": 0,
+          "custom": {
+            "drawStyle": "line",
+            "fillOpacity": 15,
+            "spanNulls": false
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "multi"
+        }
+      },
+      "description": "Latest-run values held between evaluations. Missing data means UNKNOWN; fixture mode is not a model benchmark."
+    },
+    {
+      "id": 3,
+      "title": "Mean case latency",
+      "type": "timeseries",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "workshop-prometheus"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 8,
+        "w": 12,
+        "h": 8
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "agent_eval_latency_ms{mode=\"$mode\"}",
+          "legendFormat": "{{model}} / {{suite}} / {{prompt}}",
+          "instant": false,
+          "range": true,
+          "datasource": {
+            "type": "prometheus",
+            "uid": "workshop-prometheus"
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "ms",
+          "min": 0,
+          "custom": {
+            "drawStyle": "line",
+            "fillOpacity": 15,
+            "spanNulls": false
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "multi"
+        }
+      },
+      "description": "Latest-run values held between evaluations. Missing data means UNKNOWN; fixture mode is not a model benchmark."
+    },
+    {
+      "id": 4,
+      "title": "Recorded model cost",
+      "type": "timeseries",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "workshop-prometheus"
+      },
+      "gridPos": {
+        "x": 12,
+        "y": 8,
+        "w": 12,
+        "h": 8
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "agent_eval_cost_usd{mode=\"$mode\"}",
+          "legendFormat": "{{model}} / {{suite}} / {{prompt}}",
+          "instant": false,
+          "range": true,
+          "datasource": {
+            "type": "prometheus",
+            "uid": "workshop-prometheus"
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "currencyUSD",
+          "min": 0,
+          "custom": {
+            "drawStyle": "line",
+            "fillOpacity": 15,
+            "spanNulls": false
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "multi"
+        }
+      },
+      "description": "Latest-run values held between evaluations. Missing data means UNKNOWN; fixture mode is not a model benchmark."
+    },
+    {
+      "id": 5,
+      "title": "Pricing coverage",
+      "type": "timeseries",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "workshop-prometheus"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 16,
+        "w": 12,
+        "h": 8
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "agent_eval_cost_coverage{mode=\"$mode\"}",
+          "legendFormat": "{{model}} / {{suite}} / {{prompt}}",
+          "instant": false,
+          "range": true,
+          "datasource": {
+            "type": "prometheus",
+            "uid": "workshop-prometheus"
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percentunit",
+          "min": 0,
+          "custom": {
+            "drawStyle": "line",
+            "fillOpacity": 15,
+            "spanNulls": false
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "multi"
+        }
+      },
+      "description": "Latest-run values held between evaluations. Missing data means UNKNOWN; fixture mode is not a model benchmark."
+    },
+    {
+      "id": 6,
+      "title": "Latest run complete (1=yes)",
+      "type": "timeseries",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "workshop-prometheus"
+      },
+      "gridPos": {
+        "x": 12,
+        "y": 16,
+        "w": 12,
+        "h": 8
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "agent_eval_run_complete{mode=\"$mode\"}",
+          "legendFormat": "{{model}} / {{suite}} / {{prompt}}",
+          "instant": false,
+          "range": true,
+          "datasource": {
+            "type": "prometheus",
+            "uid": "workshop-prometheus"
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "min": 0,
+          "custom": {
+            "drawStyle": "line",
+            "fillOpacity": 15,
+            "spanNulls": false
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "multi"
+        }
+      },
+      "description": "Latest-run values held between evaluations. Missing data means UNKNOWN; fixture mode is not a model benchmark."
+    },
+    {
+      "id": 7,
+      "title": "Last run timestamp",
+      "type": "timeseries",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "workshop-prometheus"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 24,
+        "w": 12,
+        "h": 8
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "agent_eval_last_run_timestamp_seconds{mode=\"$mode\"}",
+          "legendFormat": "{{model}} / {{suite}} / {{prompt}}",
+          "instant": false,
+          "range": true,
+          "datasource": {
+            "type": "prometheus",
+            "uid": "workshop-prometheus"
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "dateTimeAsIso",
+          "min": 0,
+          "custom": {
+            "drawStyle": "line",
+            "fillOpacity": 15,
+            "spanNulls": false
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "multi"
+        }
+      },
+      "description": "Latest-run values held between evaluations. Missing data means UNKNOWN; fixture mode is not a model benchmark."
+    }
+  ],
+  "links": [
+    {
+      "title": "App Health",
+      "type": "link",
+      "url": "/d/workshop-app-health",
+      "keepTime": true
+    },
+    {
+      "title": "Agent Health \u2014 v0",
+      "type": "link",
+      "url": "/d/workshop-agent-health-v0",
+      "keepTime": true
+    },
+    {
+      "title": "Agent Health \u2014 v1",
+      "type": "link",
+      "url": "/d/workshop-agent-health-v1",
+      "keepTime": true
+    },
+    {
+      "title": "Agent Cost \u2014 v2",
+      "type": "link",
+      "url": "/d/workshop-agent-cost-v2",
+      "keepTime": true
+    },
+    {
+      "title": "Traces",
+      "type": "link",
+      "url": "/d/workshop-traces",
+      "keepTime": true
+    },
+    {
+      "title": "Agent Cost \u2014 v3",
+      "type": "link",
+      "url": "/d/workshop-agent-cost-v3",
+      "keepTime": true
+    },
+    {
+      "title": "Agent Safety \u2014 v4",
+      "type": "link",
+      "url": "/d/workshop-agent-safety-v4",
+      "keepTime": true
+    },
+    {
+      "title": "Safety \u2014 v5",
+      "type": "link",
+      "url": "/d/workshop-agent-safety-v5",
+      "keepTime": true
+    }
+  ],
+  "templating": {
+    "list": [
+      {
+        "name": "mode",
+        "label": "Result source",
+        "type": "custom",
+        "query": "live,fixture",
+        "current": {
+          "text": "live",
+          "value": "live"
+        },
+        "options": [
+          {
+            "text": "live",
+            "value": "live",
+            "selected": true
+          },
+          {
+            "text": "fixture",
+            "value": "fixture",
+            "selected": false
+          }
+        ]
+      }
+    ]
+  }
+}
