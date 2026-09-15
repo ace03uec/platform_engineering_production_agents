@@ -23,11 +23,26 @@
         "label": "Service",
         "type": "custom",
         "query": "all,workshop-app,workshop-agent",
-        "current": { "text": "all", "value": "all" },
+        "current": {
+          "text": "all",
+          "value": "all"
+        },
         "options": [
-          { "text": "all", "value": "all", "selected": true },
-          { "text": "workshop-app", "value": "workshop-app", "selected": false },
-          { "text": "workshop-agent", "value": "workshop-agent", "selected": false }
+          {
+            "text": "all",
+            "value": "all",
+            "selected": true
+          },
+          {
+            "text": "workshop-app",
+            "value": "workshop-app",
+            "selected": false
+          },
+          {
+            "text": "workshop-agent",
+            "value": "workshop-agent",
+            "selected": false
+          }
         ]
       },
       {
@@ -303,6 +318,14 @@
         }
       },
       "description": "Paste the X-Trace-ID response header into the trace_id box, or click a recent trace ID. Trace details search all retained data, independently of the dashboard time range. Limited to 1,000 spans."
+    }
+  ],
+  "links": [
+    {
+      "title": "Agent Cost \u2014 v2",
+      "type": "link",
+      "url": "/d/workshop-agent-cost-v2",
+      "keepTime": true
     }
   ]
 }

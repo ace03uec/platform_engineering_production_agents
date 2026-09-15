@@ -402,6 +402,12 @@
       "type": "link",
       "url": "/d/workshop-traces",
       "keepTime": true
+    },
+    {
+      "title": "Agent Cost \u2014 v2",
+      "type": "link",
+      "url": "/d/workshop-agent-cost-v2",
+      "keepTime": true
     }
   ]
 }

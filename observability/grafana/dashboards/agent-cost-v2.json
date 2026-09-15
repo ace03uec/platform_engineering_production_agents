@@ -1,0 +1,325 @@
+{
+  "uid": "workshop-agent-cost-v2",
+  "title": "Agent Cost — v2",
+  "description": "Runaway spend demo: v2 bills a model assessment on every poll and re-diagnoses on every failed poll during an incident. Counters are cumulative since agent start and reset on restart. Missing telemetry is UNKNOWN, not zero.",
+  "schemaVersion": 41,
+  "version": 1,
+  "editable": false,
+  "tags": ["workshop", "cost", "agent"],
+  "timezone": "browser",
+  "refresh": "5s",
+  "time": { "from": "now-1h", "to": "now" },
+  "panels": [
+    {
+      "id": 1,
+      "title": "Total spend",
+      "type": "stat",
+      "datasource": { "type": "prometheus", "uid": "workshop-prometheus" },
+      "gridPos": { "x": 0, "y": 0, "w": 6, "h": 5 },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "agent_llm_cost_usd_total{version=\"v2\"}",
+          "instant": true,
+          "range": false,
+          "datasource": { "type": "prometheus", "uid": "workshop-prometheus" }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "currencyUSD",
+          "noValue": "UNKNOWN",
+          "decimals": 4,
+          "color": { "mode": "thresholds" },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "orange", "value": 0.05 },
+              { "color": "red", "value": 0.5 }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false }
+      },
+      "description": "Cumulative estimated model cost since agent start."
+    },
+    {
+      "id": 2,
+      "title": "Burn rate",
+      "type": "stat",
+      "datasource": { "type": "prometheus", "uid": "workshop-prometheus" },
+      "gridPos": { "x": 6, "y": 0, "w": 6, "h": 5 },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "rate(agent_llm_cost_usd_total{version=\"v2\"}[5m]) * 60",
+          "instant": true,
+          "range": false,
+          "datasource": { "type": "prometheus", "uid": "workshop-prometheus" }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "currencyUSD",
+          "noValue": "UNKNOWN",
+          "decimals": 4,
+          "color": { "mode": "thresholds" },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "orange", "value": 0.01 },
+              { "color": "red", "value": 0.1 }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false }
+      },
+      "description": "USD per minute, 5-minute rate."
+    },
+    {
+      "id": 3,
+      "title": "Projected daily spend",
+      "type": "stat",
+      "datasource": { "type": "prometheus", "uid": "workshop-prometheus" },
+      "gridPos": { "x": 12, "y": 0, "w": 6, "h": 5 },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "rate(agent_llm_cost_usd_total{version=\"v2\"}[15m]) * 86400",
+          "instant": true,
+          "range": false,
+          "datasource": { "type": "prometheus", "uid": "workshop-prometheus" }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "currencyUSD",
+          "noValue": "UNKNOWN",
+          "decimals": 2,
+          "color": { "mode": "thresholds" },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "orange", "value": 10 },
+              { "color": "red", "value": 100 }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false }
+      },
+      "description": "Current 15-minute burn rate extrapolated to 24 hours."
+    },
+    {
+      "id": 4,
+      "title": "Total tokens",
+      "type": "stat",
+      "datasource": { "type": "prometheus", "uid": "workshop-prometheus" },
+      "gridPos": { "x": 18, "y": 0, "w": 6, "h": 5 },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum(agent_llm_tokens_total{version=\"v2\"})",
+          "instant": true,
+          "range": false,
+          "datasource": { "type": "prometheus", "uid": "workshop-prometheus" }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "noValue": "UNKNOWN",
+          "color": { "mode": "thresholds" },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "blue", "value": null }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false }
+      }
+    },
+    {
+      "id": 5,
+      "title": "Cumulative spend",
+      "type": "timeseries",
+      "datasource": { "type": "prometheus", "uid": "workshop-prometheus" },
+      "gridPos": { "x": 0, "y": 5, "w": 12, "h": 9 },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "agent_llm_cost_usd_total{version=\"v2\"}",
+          "legendFormat": "cumulative USD",
+          "instant": false,
+          "range": true,
+          "datasource": { "type": "prometheus", "uid": "workshop-prometheus" }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "currencyUSD",
+          "min": 0,
+          "custom": { "drawStyle": "line", "fillOpacity": 15, "spanNulls": false }
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": { "displayMode": "list", "placement": "bottom" },
+        "tooltip": { "mode": "multi" }
+      },
+      "description": "The hockey stick: kinks mark poll-rate changes and incident diagnosis storms."
+    },
+    {
+      "id": 6,
+      "title": "Spend rate ($/min)",
+      "type": "timeseries",
+      "datasource": { "type": "prometheus", "uid": "workshop-prometheus" },
+      "gridPos": { "x": 12, "y": 5, "w": 12, "h": 9 },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "rate(agent_llm_cost_usd_total{version=\"v2\"}[1m]) * 60",
+          "legendFormat": "$/min",
+          "instant": false,
+          "range": true,
+          "datasource": { "type": "prometheus", "uid": "workshop-prometheus" }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "currencyUSD",
+          "min": 0,
+          "custom": { "drawStyle": "line", "fillOpacity": 15, "spanNulls": false }
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": { "displayMode": "list", "placement": "bottom" },
+        "tooltip": { "mode": "multi" }
+      }
+    },
+    {
+      "id": 7,
+      "title": "Model calls by purpose",
+      "type": "timeseries",
+      "datasource": { "type": "prometheus", "uid": "workshop-prometheus" },
+      "gridPos": { "x": 0, "y": 14, "w": 12, "h": 9 },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum by (purpose) (increase(agent_model_calls_total{version=\"v2\"}[$__rate_interval]))",
+          "legendFormat": "{{purpose}}",
+          "instant": false,
+          "range": true,
+          "datasource": { "type": "prometheus", "uid": "workshop-prometheus" }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "min": 0,
+          "custom": {
+            "drawStyle": "bars",
+            "fillOpacity": 60,
+            "stacking": { "mode": "normal" },
+            "spanNulls": false
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": { "displayMode": "list", "placement": "bottom" },
+        "tooltip": { "mode": "multi" }
+      },
+      "description": "assessment = per-poll anti-pattern; diagnosis = incident reports. A healthy app should need zero model calls."
+    },
+    {
+      "id": 8,
+      "title": "Token rate by direction",
+      "type": "timeseries",
+      "datasource": { "type": "prometheus", "uid": "workshop-prometheus" },
+      "gridPos": { "x": 12, "y": 14, "w": 12, "h": 9 },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum by (direction) (rate(agent_llm_tokens_total{version=\"v2\"}[$__rate_interval]))",
+          "legendFormat": "{{direction}}",
+          "instant": false,
+          "range": true,
+          "datasource": { "type": "prometheus", "uid": "workshop-prometheus" }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "min": 0,
+          "custom": { "drawStyle": "line", "fillOpacity": 15, "spanNulls": false }
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": { "displayMode": "list", "placement": "bottom" },
+        "tooltip": { "mode": "multi" }
+      }
+    },
+    {
+      "id": 9,
+      "title": "Tokens per call",
+      "type": "timeseries",
+      "datasource": { "type": "prometheus", "uid": "workshop-prometheus" },
+      "gridPos": { "x": 0, "y": 23, "w": 24, "h": 8 },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum(increase(agent_llm_tokens_total{version=\"v2\"}[$__rate_interval])) / sum(increase(agent_model_calls_total{version=\"v2\"}[$__rate_interval]))",
+          "legendFormat": "tokens/call",
+          "instant": false,
+          "range": true,
+          "datasource": { "type": "prometheus", "uid": "workshop-prometheus" }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "min": 0,
+          "custom": { "drawStyle": "line", "fillOpacity": 15, "spanNulls": true }
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": { "displayMode": "list", "placement": "bottom" },
+        "tooltip": { "mode": "multi" }
+      },
+      "description": "Prompt growth shows up here: a rising line means the agent is shipping ever-larger contexts."
+    }
+  ],
+  "links": [
+    { "title": "App Health", "type": "link", "url": "/d/workshop-app-health", "keepTime": true },
+    { "title": "Agent Health — v0", "type": "link", "url": "/d/workshop-agent-health-v0", "keepTime": true },
+    { "title": "Agent Health — v1", "type": "link", "url": "/d/workshop-agent-health-v1", "keepTime": true },
+    { "title": "Traces", "type": "link", "url": "/d/workshop-traces", "keepTime": true }
+  ]
+}
