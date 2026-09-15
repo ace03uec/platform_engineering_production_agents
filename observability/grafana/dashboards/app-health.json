@@ -396,6 +396,12 @@
       "type": "link",
       "url": "/d/workshop-traces",
       "keepTime": true
+    },
+    {
+      "title": "Agent Safety \u2014 v4",
+      "type": "link",
+      "url": "/d/workshop-agent-safety-v4",
+      "keepTime": true
     }
   ]
 }

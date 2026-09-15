@@ -42,6 +42,7 @@ services:
       OTEL_EXPORTER_OTLP_ENDPOINT: http://otel-collector:4318
     volumes:
       - agent-data:/data
+      - workspace-data:/workspace
     ports:
       - "127.0.0.1:${AGENT_PORT:-8090}:8090"
     healthcheck:
@@ -73,3 +74,5 @@ volumes:
   # version switches and compose project renames. One agent replica expected.
   agent-data:
     name: workshop-agent-data
+  workspace-data:
+    name: workshop-workspace

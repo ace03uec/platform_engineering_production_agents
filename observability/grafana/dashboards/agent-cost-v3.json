@@ -1,28 +1,46 @@
 {
   "uid": "workshop-agent-cost-v3",
-  "title": "Agent Cost — v3",
+  "title": "Agent Cost \u2014 v3",
   "description": "v3 adds the stop lever to v2's runaway: a budget circuit breaker (AGENT_BUDGET_USD), a manual kill switch (POST /cost/stop, /cost/resume, /cost/budget), and storm fixes (one diagnosis per incident, one call in flight). Blocked calls are counted by reason. Counters reset on agent restart.",
   "schemaVersion": 41,
   "version": 1,
   "editable": false,
-  "tags": ["workshop", "cost", "agent"],
+  "tags": [
+    "workshop",
+    "cost",
+    "agent"
+  ],
   "timezone": "browser",
   "refresh": "5s",
-  "time": { "from": "now-1h", "to": "now" },
+  "time": {
+    "from": "now-1h",
+    "to": "now"
+  },
   "panels": [
     {
       "id": 1,
       "title": "Total spend",
       "type": "stat",
-      "datasource": { "type": "prometheus", "uid": "workshop-prometheus" },
-      "gridPos": { "x": 0, "y": 0, "w": 4, "h": 5 },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "workshop-prometheus"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 0,
+        "w": 4,
+        "h": 5
+      },
       "targets": [
         {
           "refId": "A",
           "expr": "agent_llm_cost_usd_total{version=\"v3\"}",
           "instant": true,
           "range": false,
-          "datasource": { "type": "prometheus", "uid": "workshop-prometheus" }
+          "datasource": {
+            "type": "prometheus",
+            "uid": "workshop-prometheus"
+          }
         }
       ],
       "fieldConfig": {
@@ -30,13 +48,24 @@
           "unit": "currencyUSD",
           "noValue": "UNKNOWN",
           "decimals": 4,
-          "color": { "mode": "thresholds" },
+          "color": {
+            "mode": "thresholds"
+          },
           "thresholds": {
             "mode": "absolute",
             "steps": [
-              { "color": "green", "value": null },
-              { "color": "orange", "value": 0.03 },
-              { "color": "red", "value": 0.05 }
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "orange",
+                "value": 0.03
+              },
+              {
+                "color": "red",
+                "value": 0.05
+              }
             ]
           }
         },
@@ -45,22 +74,39 @@
       "options": {
         "colorMode": "value",
         "graphMode": "area",
-        "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false }
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        }
       }
     },
     {
       "id": 2,
       "title": "Budget",
       "type": "stat",
-      "datasource": { "type": "prometheus", "uid": "workshop-prometheus" },
-      "gridPos": { "x": 4, "y": 0, "w": 4, "h": 5 },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "workshop-prometheus"
+      },
+      "gridPos": {
+        "x": 4,
+        "y": 0,
+        "w": 4,
+        "h": 5
+      },
       "targets": [
         {
           "refId": "A",
           "expr": "agent_cost_budget_usd{version=\"v3\"}",
           "instant": true,
           "range": false,
-          "datasource": { "type": "prometheus", "uid": "workshop-prometheus" }
+          "datasource": {
+            "type": "prometheus",
+            "uid": "workshop-prometheus"
+          }
         }
       ],
       "fieldConfig": {
@@ -68,15 +114,31 @@
           "unit": "currencyUSD",
           "noValue": "UNKNOWN",
           "decimals": 4,
-          "color": { "mode": "thresholds" },
-          "thresholds": { "mode": "absolute", "steps": [{ "color": "blue", "value": null }] }
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "blue",
+                "value": null
+              }
+            ]
+          }
         },
         "overrides": []
       },
       "options": {
         "colorMode": "value",
         "graphMode": "none",
-        "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false }
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        }
       },
       "description": "AGENT_BUDGET_USD, adjustable live via POST /cost/budget?usd=..."
     },
@@ -84,15 +146,26 @@
       "id": 3,
       "title": "Remaining",
       "type": "stat",
-      "datasource": { "type": "prometheus", "uid": "workshop-prometheus" },
-      "gridPos": { "x": 8, "y": 0, "w": 4, "h": 5 },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "workshop-prometheus"
+      },
+      "gridPos": {
+        "x": 8,
+        "y": 0,
+        "w": 4,
+        "h": 5
+      },
       "targets": [
         {
           "refId": "A",
           "expr": "agent_cost_budget_usd{version=\"v3\"} - agent_llm_cost_usd_total{version=\"v3\"}",
           "instant": true,
           "range": false,
-          "datasource": { "type": "prometheus", "uid": "workshop-prometheus" }
+          "datasource": {
+            "type": "prometheus",
+            "uid": "workshop-prometheus"
+          }
         }
       ],
       "fieldConfig": {
@@ -100,13 +173,24 @@
           "unit": "currencyUSD",
           "noValue": "UNKNOWN",
           "decimals": 4,
-          "color": { "mode": "thresholds" },
+          "color": {
+            "mode": "thresholds"
+          },
           "thresholds": {
             "mode": "absolute",
             "steps": [
-              { "color": "red", "value": null },
-              { "color": "orange", "value": 0.005 },
-              { "color": "green", "value": 0.02 }
+              {
+                "color": "red",
+                "value": null
+              },
+              {
+                "color": "orange",
+                "value": 0.005
+              },
+              {
+                "color": "green",
+                "value": 0.02
+              }
             ]
           }
         },
@@ -115,15 +199,29 @@
       "options": {
         "colorMode": "value",
         "graphMode": "area",
-        "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false }
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        }
       }
     },
     {
       "id": 4,
       "title": "Budget breaker",
       "type": "stat",
-      "datasource": { "type": "prometheus", "uid": "workshop-prometheus" },
-      "gridPos": { "x": 12, "y": 0, "w": 4, "h": 5 },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "workshop-prometheus"
+      },
+      "gridPos": {
+        "x": 12,
+        "y": 0,
+        "w": 4,
+        "h": 5
+      },
       "targets": [
         {
           "refId": "A",
@@ -131,26 +229,43 @@
           "legendFormat": "breaker",
           "instant": true,
           "range": false,
-          "datasource": { "type": "prometheus", "uid": "workshop-prometheus" }
+          "datasource": {
+            "type": "prometheus",
+            "uid": "workshop-prometheus"
+          }
         }
       ],
       "fieldConfig": {
         "defaults": {
           "noValue": "UNKNOWN",
-          "color": { "mode": "thresholds" },
+          "color": {
+            "mode": "thresholds"
+          },
           "thresholds": {
             "mode": "absolute",
             "steps": [
-              { "color": "green", "value": null },
-              { "color": "red", "value": 1 }
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 1
+              }
             ]
           },
           "mappings": [
             {
               "type": "value",
               "options": {
-                "0": { "text": "CLOSED", "color": "green" },
-                "1": { "text": "OPEN — BLOCKING", "color": "red" }
+                "0": {
+                  "text": "CLOSED",
+                  "color": "green"
+                },
+                "1": {
+                  "text": "OPEN \u2014 BLOCKING",
+                  "color": "red"
+                }
               }
             }
           ]
@@ -160,7 +275,13 @@
       "options": {
         "colorMode": "background",
         "graphMode": "none",
-        "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false }
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        }
       },
       "description": "OPEN means cumulative spend reached the budget and all model calls are refused."
     },
@@ -168,8 +289,16 @@
       "id": 5,
       "title": "Kill switch",
       "type": "stat",
-      "datasource": { "type": "prometheus", "uid": "workshop-prometheus" },
-      "gridPos": { "x": 16, "y": 0, "w": 4, "h": 5 },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "workshop-prometheus"
+      },
+      "gridPos": {
+        "x": 16,
+        "y": 0,
+        "w": 4,
+        "h": 5
+      },
       "targets": [
         {
           "refId": "A",
@@ -177,26 +306,43 @@
           "legendFormat": "manual stop",
           "instant": true,
           "range": false,
-          "datasource": { "type": "prometheus", "uid": "workshop-prometheus" }
+          "datasource": {
+            "type": "prometheus",
+            "uid": "workshop-prometheus"
+          }
         }
       ],
       "fieldConfig": {
         "defaults": {
           "noValue": "UNKNOWN",
-          "color": { "mode": "thresholds" },
+          "color": {
+            "mode": "thresholds"
+          },
           "thresholds": {
             "mode": "absolute",
             "steps": [
-              { "color": "green", "value": null },
-              { "color": "red", "value": 1 }
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 1
+              }
             ]
           },
           "mappings": [
             {
               "type": "value",
               "options": {
-                "0": { "text": "OFF", "color": "green" },
-                "1": { "text": "STOPPED", "color": "red" }
+                "0": {
+                  "text": "OFF",
+                  "color": "green"
+                },
+                "1": {
+                  "text": "STOPPED",
+                  "color": "red"
+                }
               }
             }
           ]
@@ -206,7 +352,13 @@
       "options": {
         "colorMode": "background",
         "graphMode": "none",
-        "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false }
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        }
       },
       "description": "Operator lever: POST /cost/stop to pull it, POST /cost/resume to release."
     },
@@ -214,27 +366,46 @@
       "id": 6,
       "title": "Blocked calls",
       "type": "stat",
-      "datasource": { "type": "prometheus", "uid": "workshop-prometheus" },
-      "gridPos": { "x": 20, "y": 0, "w": 4, "h": 5 },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "workshop-prometheus"
+      },
+      "gridPos": {
+        "x": 20,
+        "y": 0,
+        "w": 4,
+        "h": 5
+      },
       "targets": [
         {
           "refId": "A",
           "expr": "sum(agent_model_calls_blocked_total{version=\"v3\"})",
           "instant": true,
           "range": false,
-          "datasource": { "type": "prometheus", "uid": "workshop-prometheus" }
+          "datasource": {
+            "type": "prometheus",
+            "uid": "workshop-prometheus"
+          }
         }
       ],
       "fieldConfig": {
         "defaults": {
           "unit": "short",
           "noValue": "UNKNOWN",
-          "color": { "mode": "thresholds" },
+          "color": {
+            "mode": "thresholds"
+          },
           "thresholds": {
             "mode": "absolute",
             "steps": [
-              { "color": "green", "value": null },
-              { "color": "red", "value": 1 }
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 1
+              }
             ]
           }
         },
@@ -243,7 +414,13 @@
       "options": {
         "colorMode": "value",
         "graphMode": "area",
-        "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false }
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        }
       },
       "description": "Model calls refused by the gate. Nonzero means the lever is actively saving money."
     },
@@ -251,8 +428,16 @@
       "id": 7,
       "title": "Cumulative spend vs budget",
       "type": "timeseries",
-      "datasource": { "type": "prometheus", "uid": "workshop-prometheus" },
-      "gridPos": { "x": 0, "y": 5, "w": 12, "h": 9 },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "workshop-prometheus"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 5,
+        "w": 12,
+        "h": 9
+      },
       "targets": [
         {
           "refId": "A",
@@ -260,7 +445,10 @@
           "legendFormat": "spend",
           "instant": false,
           "range": true,
-          "datasource": { "type": "prometheus", "uid": "workshop-prometheus" }
+          "datasource": {
+            "type": "prometheus",
+            "uid": "workshop-prometheus"
+          }
         },
         {
           "refId": "B",
@@ -268,29 +456,62 @@
           "legendFormat": "budget",
           "instant": false,
           "range": true,
-          "datasource": { "type": "prometheus", "uid": "workshop-prometheus" }
+          "datasource": {
+            "type": "prometheus",
+            "uid": "workshop-prometheus"
+          }
         }
       ],
       "fieldConfig": {
         "defaults": {
           "unit": "currencyUSD",
           "min": 0,
-          "custom": { "drawStyle": "line", "fillOpacity": 15, "spanNulls": false }
+          "custom": {
+            "drawStyle": "line",
+            "fillOpacity": 15,
+            "spanNulls": false
+          }
         },
         "overrides": [
           {
-            "matcher": { "id": "byName", "options": "budget" },
+            "matcher": {
+              "id": "byName",
+              "options": "budget"
+            },
             "properties": [
-              { "id": "custom.lineStyle", "value": { "fill": "dash", "dash": [8, 8] } },
-              { "id": "custom.fillOpacity", "value": 0 },
-              { "id": "color", "value": { "mode": "fixed", "fixedColor": "red" } }
+              {
+                "id": "custom.lineStyle",
+                "value": {
+                  "fill": "dash",
+                  "dash": [
+                    8,
+                    8
+                  ]
+                }
+              },
+              {
+                "id": "custom.fillOpacity",
+                "value": 0
+              },
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "red"
+                }
+              }
             ]
           }
         ]
       },
       "options": {
-        "legend": { "displayMode": "list", "placement": "bottom" },
-        "tooltip": { "mode": "multi" }
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "multi"
+        }
       },
       "description": "The v2 hockey stick now flattens when spend meets the budget."
     },
@@ -298,8 +519,16 @@
       "id": 8,
       "title": "Spend rate ($/min)",
       "type": "timeseries",
-      "datasource": { "type": "prometheus", "uid": "workshop-prometheus" },
-      "gridPos": { "x": 12, "y": 5, "w": 12, "h": 9 },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "workshop-prometheus"
+      },
+      "gridPos": {
+        "x": 12,
+        "y": 5,
+        "w": 12,
+        "h": 9
+      },
       "targets": [
         {
           "refId": "A",
@@ -307,29 +536,49 @@
           "legendFormat": "$/min",
           "instant": false,
           "range": true,
-          "datasource": { "type": "prometheus", "uid": "workshop-prometheus" }
+          "datasource": {
+            "type": "prometheus",
+            "uid": "workshop-prometheus"
+          }
         }
       ],
       "fieldConfig": {
         "defaults": {
           "unit": "currencyUSD",
           "min": 0,
-          "custom": { "drawStyle": "line", "fillOpacity": 15, "spanNulls": false }
+          "custom": {
+            "drawStyle": "line",
+            "fillOpacity": 15,
+            "spanNulls": false
+          }
         },
         "overrides": []
       },
       "options": {
-        "legend": { "displayMode": "list", "placement": "bottom" },
-        "tooltip": { "mode": "multi" }
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "multi"
+        }
       },
-      "description": "Drops to zero when the breaker opens or the kill switch is pulled — proof the lever works."
+      "description": "Drops to zero when the breaker opens or the kill switch is pulled \u2014 proof the lever works."
     },
     {
       "id": 9,
       "title": "Model calls by purpose",
       "type": "timeseries",
-      "datasource": { "type": "prometheus", "uid": "workshop-prometheus" },
-      "gridPos": { "x": 0, "y": 14, "w": 12, "h": 9 },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "workshop-prometheus"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 14,
+        "w": 12,
+        "h": 9
+      },
       "targets": [
         {
           "refId": "A",
@@ -337,7 +586,10 @@
           "legendFormat": "{{purpose}}",
           "instant": false,
           "range": true,
-          "datasource": { "type": "prometheus", "uid": "workshop-prometheus" }
+          "datasource": {
+            "type": "prometheus",
+            "uid": "workshop-prometheus"
+          }
         }
       ],
       "fieldConfig": {
@@ -347,31 +599,49 @@
           "custom": {
             "drawStyle": "bars",
             "fillOpacity": 60,
-            "stacking": { "mode": "normal" },
+            "stacking": {
+              "mode": "normal"
+            },
             "spanNulls": false
           }
         },
         "overrides": []
       },
       "options": {
-        "legend": { "displayMode": "list", "placement": "bottom" },
-        "tooltip": { "mode": "multi" }
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "multi"
+        }
       }
     },
     {
       "id": 10,
       "title": "Blocked calls by reason",
       "type": "timeseries",
-      "datasource": { "type": "prometheus", "uid": "workshop-prometheus" },
-      "gridPos": { "x": 12, "y": 14, "w": 12, "h": 9 },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "workshop-prometheus"
+      },
+      "gridPos": {
+        "x": 12,
+        "y": 14,
+        "w": 12,
+        "h": 9
+      },
       "targets": [
         {
           "refId": "A",
           "expr": "sum by (purpose, reason) (increase(agent_model_calls_blocked_total{version=\"v3\"}[$__rate_interval]))",
-          "legendFormat": "{{purpose}} — {{reason}}",
+          "legendFormat": "{{purpose}} \u2014 {{reason}}",
           "instant": false,
           "range": true,
-          "datasource": { "type": "prometheus", "uid": "workshop-prometheus" }
+          "datasource": {
+            "type": "prometheus",
+            "uid": "workshop-prometheus"
+          }
         }
       ],
       "fieldConfig": {
@@ -381,24 +651,62 @@
           "custom": {
             "drawStyle": "bars",
             "fillOpacity": 60,
-            "stacking": { "mode": "normal" },
+            "stacking": {
+              "mode": "normal"
+            },
             "spanNulls": false
           }
         },
         "overrides": []
       },
       "options": {
-        "legend": { "displayMode": "list", "placement": "bottom" },
-        "tooltip": { "mode": "multi" }
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "multi"
+        }
       },
       "description": "budget = breaker open, stopped = kill switch pulled, concurrency = single-flight slot busy."
     }
   ],
   "links": [
-    { "title": "App Health", "type": "link", "url": "/d/workshop-app-health", "keepTime": true },
-    { "title": "Agent Health — v0", "type": "link", "url": "/d/workshop-agent-health-v0", "keepTime": true },
-    { "title": "Agent Health — v1", "type": "link", "url": "/d/workshop-agent-health-v1", "keepTime": true },
-    { "title": "Agent Cost — v2", "type": "link", "url": "/d/workshop-agent-cost-v2", "keepTime": true },
-    { "title": "Traces", "type": "link", "url": "/d/workshop-traces", "keepTime": true }
+    {
+      "title": "App Health",
+      "type": "link",
+      "url": "/d/workshop-app-health",
+      "keepTime": true
+    },
+    {
+      "title": "Agent Health \u2014 v0",
+      "type": "link",
+      "url": "/d/workshop-agent-health-v0",
+      "keepTime": true
+    },
+    {
+      "title": "Agent Health \u2014 v1",
+      "type": "link",
+      "url": "/d/workshop-agent-health-v1",
+      "keepTime": true
+    },
+    {
+      "title": "Agent Cost \u2014 v2",
+      "type": "link",
+      "url": "/d/workshop-agent-cost-v2",
+      "keepTime": true
+    },
+    {
+      "title": "Traces",
+      "type": "link",
+      "url": "/d/workshop-traces",
+      "keepTime": true
+    },
+    {
+      "title": "Agent Safety \u2014 v4",
+      "type": "link",
+      "url": "/d/workshop-agent-safety-v4",
+      "keepTime": true
+    }
   ]
 }

@@ -414,6 +414,12 @@
       "type": "link",
       "url": "/d/workshop-agent-cost-v3",
       "keepTime": true
+    },
+    {
+      "title": "Agent Safety \u2014 v4",
+      "type": "link",
+      "url": "/d/workshop-agent-safety-v4",
+      "keepTime": true
     }
   ]
 }
