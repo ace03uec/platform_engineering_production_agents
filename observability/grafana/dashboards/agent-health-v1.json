@@ -1,6 +1,6 @@
 {
-  "uid": "workshop-agent-health",
-  "title": "Agent Health",
+  "uid": "workshop-agent-health-v1",
+  "title": "Agent Health \u2014 v1",
   "description": "Liveness: HTTP server responds. Readiness: monitor completed a poll within 45 seconds and is not stopping. Does not require a healthy app or validate model credentials/provider availability. External HTTP probes every 5 seconds. Missing telemetry is UNKNOWN, not healthy.",
   "schemaVersion": 41,
   "version": 1,
@@ -34,7 +34,7 @@
       "targets": [
         {
           "refId": "A",
-          "expr": "probe_success{job=\"health-probes\",service=\"workshop-agent\",check=\"liveness\"} and on(job,instance) (up{job=\"health-probes\",service=\"workshop-agent\",check=\"liveness\"} == 1)",
+          "expr": "probe_success{job=\"health-probes\",service=\"workshop-agent\",version=\"v1\",check=\"liveness\"} and on(job,instance) (up{job=\"health-probes\",service=\"workshop-agent\",version=\"v1\",check=\"liveness\"} == 1)",
           "legendFormat": "{{check}}",
           "instant": true,
           "range": false,
@@ -111,7 +111,7 @@
       "targets": [
         {
           "refId": "A",
-          "expr": "probe_success{job=\"health-probes\",service=\"workshop-agent\",check=\"readiness\"} and on(job,instance) (up{job=\"health-probes\",service=\"workshop-agent\",check=\"readiness\"} == 1)",
+          "expr": "probe_success{job=\"health-probes\",service=\"workshop-agent\",version=\"v1\",check=\"readiness\"} and on(job,instance) (up{job=\"health-probes\",service=\"workshop-agent\",version=\"v1\",check=\"readiness\"} == 1)",
           "legendFormat": "{{check}}",
           "instant": true,
           "range": false,
@@ -188,7 +188,7 @@
       "targets": [
         {
           "refId": "A",
-          "expr": "min(up{job=\"health-probes\",service=\"workshop-agent\"})",
+          "expr": "min(up{job=\"health-probes\",service=\"workshop-agent\",version=\"v1\"})",
           "legendFormat": "{{check}}",
           "instant": true,
           "range": false,
@@ -265,7 +265,7 @@
       "targets": [
         {
           "refId": "A",
-          "expr": "probe_success{job=\"health-probes\",service=\"workshop-agent\"} and on(job,instance) (up{job=\"health-probes\",service=\"workshop-agent\"} == 1)",
+          "expr": "probe_success{job=\"health-probes\",service=\"workshop-agent\",version=\"v1\"} and on(job,instance) (up{job=\"health-probes\",service=\"workshop-agent\",version=\"v1\"} == 1)",
           "legendFormat": "{{check}}",
           "instant": false,
           "range": true,
@@ -347,7 +347,7 @@
       "targets": [
         {
           "refId": "A",
-          "expr": "probe_duration_seconds{job=\"health-probes\",service=\"workshop-agent\"} and on(job,instance) (up{job=\"health-probes\",service=\"workshop-agent\"} == 1)",
+          "expr": "probe_duration_seconds{job=\"health-probes\",service=\"workshop-agent\",version=\"v1\"} and on(job,instance) (up{job=\"health-probes\",service=\"workshop-agent\",version=\"v1\"} == 1)",
           "legendFormat": "{{check}}",
           "instant": false,
           "range": true,
