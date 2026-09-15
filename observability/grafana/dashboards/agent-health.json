@@ -420,6 +420,12 @@
       "type": "link",
       "url": "/d/workshop-agent-safety-v4",
       "keepTime": true
+    },
+    {
+      "title": "Agent Safety \u2014 v5",
+      "type": "link",
+      "url": "/d/workshop-agent-safety-v5",
+      "keepTime": true
     }
   ]
 }

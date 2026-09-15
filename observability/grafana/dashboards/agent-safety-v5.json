@@ -1,7 +1,7 @@
 {
-  "uid": "workshop-agent-safety-v4",
-  "title": "Agent Safety \u2014 v4",
-  "description": "Disposable workspace demo. A careless runbook deletes protected business fixtures without approval. No host files are mounted. Counts reflect successful delete operations, including directory deletions.",
+  "uid": "workshop-agent-safety-v5",
+  "title": "Agent Safety \u2014 v5",
+  "description": "Protected files are denied in code. Cleanup requires authenticated operator approval. Pending is not deleted. Operator fixture replay is available without a model.",
   "schemaVersion": 41,
   "version": 1,
   "editable": false,
@@ -19,7 +19,7 @@
   "panels": [
     {
       "id": 1,
-      "title": "Delete operations",
+      "title": "Protected / denied attempts",
       "type": "stat",
       "datasource": {
         "type": "prometheus",
@@ -34,7 +34,7 @@
       "targets": [
         {
           "refId": "A",
-          "expr": "sum(agent_files_deleted_total{version=\"v4\"})",
+          "expr": "agent_safety_decisions_total{version=\"v5\",decision=\"blocked\"}",
           "instant": true,
           "range": false,
           "datasource": {
@@ -65,7 +65,7 @@
     },
     {
       "id": 2,
-      "title": "Files remaining",
+      "title": "Pending approvals",
       "type": "stat",
       "datasource": {
         "type": "prometheus",
@@ -80,7 +80,7 @@
       "targets": [
         {
           "refId": "A",
-          "expr": "agent_workspace_files_remaining{version=\"v4\"}",
+          "expr": "agent_approvals_pending{version=\"v5\"}",
           "instant": true,
           "range": false,
           "datasource": {
@@ -111,7 +111,7 @@
     },
     {
       "id": 3,
-      "title": "Tool executions",
+      "title": "Approved deletions",
       "type": "stat",
       "datasource": {
         "type": "prometheus",
@@ -126,7 +126,7 @@
       "targets": [
         {
           "refId": "A",
-          "expr": "sum(agent_tool_calls_total{version=\"v4\"})",
+          "expr": "agent_safety_decisions_total{version=\"v5\",decision=\"approved\"}",
           "instant": true,
           "range": false,
           "datasource": {
@@ -157,7 +157,7 @@
     },
     {
       "id": 4,
-      "title": "Completed remediation sessions",
+      "title": "Files remaining",
       "type": "stat",
       "datasource": {
         "type": "prometheus",
@@ -172,7 +172,7 @@
       "targets": [
         {
           "refId": "A",
-          "expr": "agent_model_calls_total{version=\"v4\",purpose=\"remediation\"}",
+          "expr": "agent_workspace_files_remaining{version=\"v5\"}",
           "instant": true,
           "range": false,
           "datasource": {
@@ -218,7 +218,7 @@
       "targets": [
         {
           "refId": "A",
-          "expr": "agent_workspace_files_remaining{version=\"v4\"}",
+          "expr": "agent_workspace_files_remaining{version=\"v5\"}",
           "legendFormat": "files",
           "instant": false,
           "range": true,
@@ -268,7 +268,7 @@
       "targets": [
         {
           "refId": "A",
-          "expr": "agent_files_deleted_total{version=\"v4\"}",
+          "expr": "agent_files_deleted_total{version=\"v5\"}",
           "legendFormat": "{{path}}",
           "instant": false,
           "range": true,
@@ -340,9 +340,9 @@
       "keepTime": true
     },
     {
-      "title": "Agent Safety \u2014 v5",
+      "title": "Agent Safety \u2014 v4",
       "type": "link",
-      "url": "/d/workshop-agent-safety-v5",
+      "url": "/d/workshop-agent-safety-v4",
       "keepTime": true
     }
   ]
